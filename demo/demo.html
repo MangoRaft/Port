@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="http://fastly.github.io/epoch/css/epoch.css">
+		<script src="http://fastly.github.io/epoch/js/jquery.js"></script>
+		<script src="http://fastly.github.io/epoch/js/d3.js"></script>
+		<script src="http://fastly.github.io/epoch/js/epoch.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/async/0.9.0/async.js"></script>
+
+	</head>
+	<body >
+		<p>
+			Memory
+		</p>
+		<div id="memory" class="epoch category20c" style="width: 100%; height: 200px;"></div>
+		<p>
+			cpu
+		</p>
+		<div id="cpu" class="epoch category20c" style="width: 100%; height: 200px;"></div>
+		<p>
+			io
+		</p>
+		<div id="io" class="epoch" style="width: 100%; height: 200px;"></div>
+
+	</body>
+
+	<script>
+		var push = new WebSocket("ws://127.0.0.1:4002/metrics");
+		var pull = new WebSocket("ws://127.0.0.1:4001/");
+		var chart = {};
+
+		pull.onmessage = function(event) {
+			var json = JSON.parse(event.data);
+			chart[json.group].push(json.results.map(function(update) {
+				return {
+					time : update[0],
+					y : update[1]
+				};
+			}));
+		};
+
+		function buildCharts(type, sessions) {
+
+			async.parallel(sessions.map(function(item) {
+				console.log(item)
+				return function(cb) {
+					$.getJSON('http://localhost:4001/metric/' + item.session + '?from=a minute ago', function(data) {
+						cb(null, data);
+					});
+					console.log({
+						event : 'start',
+						group : type,
+						schema : item.session
+					})
+					pull.send(JSON.stringify({
+						event : 'start',
+						group : type,
+						schema : item.session
+					}));
+				};
+			}), function(err, results) {
+				chart[type] = $('#' + type).epoch({
+					type : 'time.line',
+					axes : ['right', 'bottom', 'left'],
+					data : results.map(function(data, index) {
+						return {
+							label : sessions[index].name,
+							values : data.map(function(i) {
+								return {
+									time : i[0],
+									y : i[1]
+								};
+							})
+						};
+					}),
+					pixelRatio : 1
+				});
+			});
+
+		}
+
+		$(function() {
+
+			var memory = [{
+				session : 'docker.test.stress.memory.cache',
+				name : 'cache'
+			}, {
+				session : 'docker.test.stress.memory.rss',
+				name : 'rss'
+			}, {
+				session : 'docker.test.stress.memory.swap',
+				name : 'swap'
+			}];
+			var cpu = [{
+				session : 'docker.test.stress.cpu.user',
+				name : 'cache'
+			}, {
+				session : 'docker.test.stress.cpu.system',
+				name : 'rss'
+			}];
+
+			var io = [{
+				session : 'docker.test.stress.io.sectors',
+				name : 'sectors'
+			}, {
+				session : 'docker.test.stress.io.serviceBytesRead',
+				name : 'serviceBytesRead'
+			}, {
+				session : 'docker.test.stress.io.serviceBytesWrite',
+				name : 'serviceBytesWrite'
+			}, {
+				session : 'docker.test.stress.io.serviceBytesTotal',
+				name : 'serviceBytesTotal'
+			}];
+			setTimeout(function() {
+
+				buildCharts('memory', memory)
+				buildCharts('cpu', cpu)
+				buildCharts('io', io)
+			}, 3000)
+		});
+		$(function() {
+			return;
+
+			$.getJSON('http://localhost:4001/metric/docker.test.cpu.system', function(cpuSystem) {
+				$.getJSON('http://localhost:4001/metric/docker.test.cpu.user', function(cpuUser) {
+					var seriesOptions = [];
+					seriesOptions.push({
+						name : 'cpuSystem',
+						data : cpuSystem
+					});
+					seriesOptions.push({
+						name : 'cpuUser',
+						data : cpuUser
+					});
+					$('#cpu1').highcharts('StockChart', {
+
+						rangeSelector : {
+							selected : 1,
+							buttons : [{
+								type : 'minute',
+								count : 1,
+								text : '1m'
+							}, {
+								type : 'minute',
+								count : 10,
+								text : '10m'
+							}, {
+								type : 'minute',
+								count : 150,
+								text : '150m'
+							}, {
+								type : 'all',
+								text : 'All'
+							}]
+						},
+
+						yAxis : {
+							labels : {
+
+							},
+							plotLines : [{
+								value : 0,
+								width : 2,
+								color : 'silver'
+							}]
+						},
+
+						series : seriesOptions
+					});
+
+				});
+			});
+			$.getJSON('http://localhost:4001/metric/docker.test.memory.cache', function(cache) {
+				$.getJSON('http://localhost:4001/metric/docker.test.memory.rss', function(rss) {
+					$.getJSON('http://localhost:4001/metric/docker.test.memory.swap', function(swap) {
+						var seriesOptions = [];
+						seriesOptions.push({
+							name : 'cache',
+							data : cache
+						});
+						seriesOptions.push({
+							name : 'rss',
+							data : rss
+						});
+						seriesOptions.push({
+							name : 'swap',
+							data : swap
+						});
+						$('#memory1').highcharts('StockChart', {
+
+							rangeSelector : {
+								selected : 1,
+								buttons : [{
+									type : 'minute',
+									count : 1,
+									text : '1m'
+								}, {
+									type : 'minute',
+									count : 10,
+									text : '10m'
+								}, {
+									type : 'minute',
+									count : 150,
+									text : '150m'
+								}, {
+									type : 'all',
+									text : 'All'
+								}]
+							},
+
+							yAxis : {
+								labels : {
+
+								},
+								plotLines : [{
+									value : 0,
+									width : 2,
+									color : 'silver'
+								}]
+							},
+
+							series : seriesOptions
+						});
+
+					});
+				});
+			});
+		});
+	</script>
+</html>

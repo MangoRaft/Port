@@ -1,0 +1,23 @@
+{
+  "name": "port-docker",
+  "version": "0.0.1",
+  "description": "Docker management",
+  "main": "./lib/port.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MangoRaft/Port.git"
+  },
+  "dependencies": {
+    "async": "0.9.0",
+    "dockerode": "2.0.6",
+    "metrics-server": "0.1.4",
+    "raft-logger-redis": "0.2.1"
+  },
+  "keywords": [
+    "docker",
+    "management"
+  ],
+  "homepage": "https://github.com/MangoRaft/Port",
+  "author": "Tim <mangoraft@gmail.com>",
+  "license": "MIT"
+}
