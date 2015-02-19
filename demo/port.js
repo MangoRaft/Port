@@ -13,22 +13,22 @@ var p = new Port({
 });
 
 p.on('run', function(data) {
-	//console.log('run');
+	console.log('run');
 });
 p.on('start', function(data) {
-	//console.log('start', data);
+	console.log('start', data);
 });
 p.on('stop', function(data) {
-	//console.log('stop');
+	console.log('stop');
 });
 p.on('death', function(data) {
-	//console.log('death');
+	console.log('death');
 });
 p.on('attach', function(data) {
-	//console.log('attach');
+	console.log('attach');
 });
-p.on('attach', function(data) {
-	//console.log('attach');
+p.on('container error', function(error) {
+	console.log('container error', error);
 });
 
 p.run();
@@ -54,13 +54,18 @@ var redis = {
 		}
 	},
 	logSession : 'docker.test',
+	source : 'app',
+	channel : 'redis.1',
 	name : 'docker.test',
 	index : 1,
+	env : {
+		hello : 'world'
+	},
 	uid : 'uid',
 	username : 'demo',
 	limits : {
-		memory : '128m',
-		swap : '128m',
+		memory : 15242880,
+		swap : 15242880,
 		cpuShares : 512,
 		cpuset : "0,1,2"
 	},
@@ -88,23 +93,25 @@ var stress = {
 		}
 	},
 	logSession : 'docker.test.stress',
-	name : 'docker.test.stress',
+	source : 'app',
+	name : 'stress',
 	index : 1,
 	uid : 'uid.stress',
 	username : 'demo.stress',
 	limits : {
-		//memory : 2621440000,
-		//swap : 2621440000,
-		cpuShares : 512,
-		//cpuset : "0,1,2"
+		memory : 75,
+		cpuShares : 128,
+		cpuset : "0,1,2,3"
 	},
 	image : 'progrium/stress',
-	cmd : ['--cpu', '2', '--io', '4', '--vm', '2', '--vm-bytes', '7555M'],
+	cmd : ['--cpu', '2', '--vm', '1', '--vm-bytes', '40M', '-q'],
 	exposedPorts : []
 };
 
-p.start(stress, function(err, info) {
-	console.log('service running', info);
+p.start(redis, function(err, container) {
+	container.info(function(err, info) {
+		console.log('service running', info);
+	});
 });
 
 process.on('SIGINT', function() {

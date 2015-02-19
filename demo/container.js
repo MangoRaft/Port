@@ -29,7 +29,9 @@ var c = new Container({
 			"host" : "127.0.0.1"
 		}
 	},
-	logSession : 'docker.test',
+	logSession : 'docker.test.redis.1',
+	source : 'app',
+	channel : 'redis.1',
 	name : 'ubuntu',
 	index : 1,
 	docker : docker,
@@ -74,54 +76,45 @@ var c = new Container({
 });
 
 c.on('container', function(data) {
-	console.log('container', data);
+	//console.log('container', data);
 });
 c.on('_start', function(data) {
-	console.log('_start', data);
+	//console.log('_start', data);
 });
-c.on('start', function(data) {
-	console.log('start', data);
+c.on('RUNNING', function() {
+	console.log('container is now running.');
 
 	c.top(function(err, data) {
 		console.log('top', data);
-		c.inspect(function(err, data) {
-			console.log('inspect', data);
-		});
+	});
+	c.inspect(function(err, data) {
+		//console.log('inspect', data);
+	});
+	c.info(function(err, data) {
+		console.log('info', data);
 	});
 });
 c.on('attach', function(data) {
 	console.log('attach');
 });
-c.on('stats memory', function(data) {
-	console.log('stats memory', data);
-});
-c.on('stats cpu', function(data) {
-	console.log('stats cpu', data);
-});
-c.on('exit', function(data) {
-	console.log('exit', data);
-});
-c.on('_stop', function(data) {
-	console.log('_stop', data);
-});
-c.on('_clean', function(data) {
-	console.log('_clean', data);
-});
-c.on('death', function(data) {
-	console.log('death', data);
+c.states.forEach(function(state) {
+	c.on(state, function(data) {
+		console.log('State changed to: ' + state);
+	});
 });
 
 process.on('SIGINT', function() {
-
-	c.once('stop', function(data) {
-		console.log('stop', data);
+	if (c.state > 3)
+		process.exit(1);
+	c.once('STOPPED', function(data) {
+		//console.log('STOPPED');
 		process.exit(1);
 	});
-	c.once('death', function(data) {
-		console.log('death', data);
+	c.once('DELETED', function(data) {
+		//console.log('CRASHED', data);
 		process.exit(1);
 	});
 	c.stop(false);
 });
 
-c.start(); 
+c.start();
