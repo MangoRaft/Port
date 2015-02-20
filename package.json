@@ -1,21 +1,25 @@
 {
-	"name": "port-docker",
-	"version": "0.0.2",
-	"description": "Docker management",
-	"main": "./lib/port.js",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/MangoRaft/Port.git"
-	},
-	"dependencies": {
-		"async": "0.9.0",
-		"dockerode": "2.0.6",
-		"metrics-server": "0.1.4",
-		"raft-logger-redis": "0.2.x",
-		"portfinder": "0.4.0"
-	},
-	"keywords": ["docker", "management"],
-	"homepage": "https://github.com/MangoRaft/Port",
-	"author": "Tim <mangoraft@gmail.com>",
-	"license": "MIT"
+  "name": "port-docker",
+  "version": "0.0.2",
+  "description": "Docker management",
+  "main": "./lib/port.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MangoRaft/Port.git"
+  },
+  "dependencies": {
+    "async": "0.9.0",
+    "dockerode": "2.0.6",
+    "express": "^4.11.2",
+    "metrics-server": "0.1.4",
+    "portfinder": "0.4.0",
+    "raft-logger-redis": "0.2.x"
+  },
+  "keywords": [
+    "docker",
+    "management"
+  ],
+  "homepage": "https://github.com/MangoRaft/Port",
+  "author": "Tim <mangoraft@gmail.com>",
+  "license": "MIT"
 }

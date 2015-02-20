@@ -34,12 +34,12 @@ p.on('container error', function(error) {
 p.run();
 
 var redis = {
-	metrics : {
+	"metrics" : {
 		"port" : 4001,
 		"host" : "127.0.0.1"
 	},
-	metricSesion : 'docker.test',
-	logs : {
+	"metricSesion" : "docker.test",
+	"logs" : {
 		"web" : {
 			"port" : 5000,
 			"host" : "127.0.0.1"
@@ -53,24 +53,23 @@ var redis = {
 			"host" : "127.0.0.1"
 		}
 	},
-	logSession : 'docker.test',
-	source : 'app',
-	channel : 'redis.1',
-	name : 'docker.test',
-	index : 1,
-	env : {
-		hello : 'world'
+	"logSession" : "docker.test",
+	"source" : "app",
+	"channel" : "redis.1",
+	"name" : "docker.test",
+	"index" : 1,
+	"env" : {
+		"hello" : "world"
 	},
-	uid : 'uid',
-	username : 'demo',
-	limits : {
-		memory : 15242880,
-		swap : 15242880,
-		cpuShares : 512,
-		cpuset : "0,1,2"
+	"uid" : "uid",
+	"username" : "demo",
+	"limits" : {
+		"memory" : 128,
+		"cpuShares" : 256,
+		"cpuset" : "0,1"
 	},
-	image : 'redis',
-	exposedPorts : ['6379/tcp']
+	"image" : "redis",
+	"exposedPorts" : ["6379/tcp"]
 };
 var stress = {
 	metrics : {
@@ -109,8 +108,18 @@ var stress = {
 };
 
 p.start(redis, function(err, container) {
-	container.info(function(err, info) {
-		console.log('service running', info);
+	p.start(redis, function(err, container) {
+
+		p.start(redis, function(err, container) {
+
+			p.start(redis, function(err, container) {
+				p.start(redis, function(err, container) {
+					container.info(function(err, info) {
+						console.log('service running', info, p);
+					});
+				});
+			});
+		});
 	});
 });
 
