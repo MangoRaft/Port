@@ -11,14 +11,17 @@ if (!stats.isSocket()) {
 }
 
 var docker = new Docker({
-	socketPath : socket
+
+	"host" : "127.0.0.1",
+	"port" : 5000
+
 });
 
 var c = new Container({
 	logs : {
 		"web" : {
-			"port" : 5000,
-			"host" : "127.0.0.1"
+			"port" : 80,
+			"host" : "..."
 		},
 		"udp" : {
 			"port" : 5000,
@@ -43,12 +46,7 @@ var c = new Container({
 		"MemorySwap" : 0,
 		"CpuShares" : 512,
 		"Cpuset" : "0,1",
-		//"AttachStdin" : false,
-		//"AttachStdout" : true,
-		//"AttachStderr" : true,
 		"Tty" : false,
-		//"OpenStdin" : false,
-		//"StdinOnce" : false,
 		"Env" : null,
 		//"Cmd" : ["ps", "aux"],
 		"Entrypoint" : "",
@@ -65,38 +63,19 @@ var c = new Container({
 		"HostConfig" : {
 			"PortBindings" : {
 				"6379/tcp" : [{
-					"HostPort" : "11022"
+
 				}]
 			},
+			"PublishAllPorts" : true,
 		}
 	},
 	"SecurityOpts" : [""],
 	"Dns" : ["8.8.8.8"]
 
 });
-
-c.on('container', function(data) {
-	//console.log('container', data);
-});
-c.on('_start', function(data) {
-	//console.log('_start', data);
-});
-c.on('RUNNING', function() {
-	console.log('container is now running.');
-
-	c.top(function(err, data) {
-		console.log('top', data);
-	});
-	c.inspect(function(err, data) {
-		//console.log('inspect', data);
-	});
-	c.info(function(err, data) {
-		console.log('info', data);
-	});
-});
-c.on('attach', function(data) {
-	console.log('attach');
-});
+c.on('error', function(err) {
+	console.log(err)
+})
 c.states.forEach(function(state) {
 	c.on(state, function(data) {
 		console.log('State changed to: ' + state);
@@ -106,15 +85,22 @@ c.states.forEach(function(state) {
 process.on('SIGINT', function() {
 	if (c.state > 3)
 		process.exit(1);
-	c.once('STOPPED', function(data) {
-		//console.log('STOPPED');
+	c.stop(false, function(err) {
 		process.exit(1);
 	});
-	c.once('DELETED', function(data) {
-		//console.log('CRASHED', data);
-		process.exit(1);
-	});
-	c.stop(false);
 });
 
-c.start();
+c.start(function(err) {
+	if (err)
+		throw err;
+
+	c.top(function(err, data) {
+		console.log('top', data);
+	});
+	c.inspect(function(err, data) {
+		console.log('inspect', data.NetworkSettings.Ports);
+	});
+	c.info(function(err, data) {
+		console.log('info', data);
+	});
+});
