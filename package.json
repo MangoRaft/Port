@@ -12,7 +12,6 @@
     "debug": "^2.1.1",
     "dockerode": "2.0.6",
     "express": "^4.11.2",
-    "metrics-server": "0.1.4",
     "portfinder": "0.4.0",
     "raft-logger-redis": "0.2.x"
   },
