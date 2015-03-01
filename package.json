@@ -1,6 +1,6 @@
 {
   "name": "port-docker",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Docker management",
   "main": "./lib/port.js",
   "repository": {
@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "async": "0.9.0",
+    "colors": "^1.0.3",
     "debug": "^2.1.1",
     "dockerode": "2.0.6",
     "express": "^4.11.2",
