@@ -1,6 +1,6 @@
 {
   "name": "port-docker",
-  "version": "0.1.16",
+  "version": "0.1.21",
   "description": "Docker management",
   "main": "./lib/port.js",
   "repository": {
