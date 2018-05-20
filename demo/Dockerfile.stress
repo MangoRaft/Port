@@ -1,0 +1,6 @@
+FROM centos:6
+
+RUN yum install -y epel-release
+RUN yum install -y stress
+
+ENTRYPOINT ["/usr/bin/stress", "--verbose"]

@@ -11,7 +11,7 @@
     "async": "0.9.0",
     "colors": "^1.0.3",
     "debug": "^2.1.1",
-    "dockerode": "2.3.1",
+    "dockerode": "^2.5.5",
     "express": "^4.11.2",
     "portfinder": "0.4.0",
     "raft-logger-redis": "0.2.x"
