@@ -43,7 +43,7 @@ var cpu = {
     exclude: ['progrium/stress'],
     ports: [],
     shortLived: true,
-    cmd: '--cpu 1 --io 1 --vm 3 --vm-bytes 128M --timeout 10m -v',
+    cmd: '--cpu 1 --io 1 --vm 3 --vm-bytes 128M --timeout 10s -v',
     stats: true,
     size: {
         memory: 512,
@@ -127,8 +127,9 @@ async function memStart() {
 
     console.log('avalibale:', p.avalibale())
 }
-
+let i = 0
 async function cpuStart() {
+    cpu.uid='aaaaa'+i++
     let cpuContainer = await p.start(cpu);
 
     cpuContainer.on('stats', function (stats) {
@@ -145,4 +146,5 @@ async function cpuStart() {
 p.on('error', function (err) {
     // console.log(err);
 });
+cpuStart()
 cpuStart()
