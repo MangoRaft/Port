@@ -14,7 +14,8 @@
     "dockerode": "^2.5.5",
     "express": "^4.11.2",
     "portfinder": "0.4.0",
-    "raft-logger-redis": "0.2.x"
+    "raft-logger-redis": "0.2.x",
+    "dstats":"https://github.com/MangoRaft/DStats.git"
   },
   "keywords": [
     "docker",
